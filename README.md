@@ -1,5 +1,12 @@
 **This is an edited version of the go-deep library except it has been converted to 32-bit for better performance and some extra activation functions have been added (Elu, Mish and Swish)**
 
+**
+
+Update: 3 new activation functions have been added, 1 custom function for experimenting with activation functions and 2 new activation functions, RootX and DoubleRoot... these 2 functions seem to be able to be used to train unusually deep neural networks.
+
+I have also added an experimental Bonds system that is designed to strengthen or weaken the bonds between the neuraon in each layer, not sure if it works well but it is easy to turn off.
+**
+
 # neural-net
 
 Feed forward/backpropagation neural network implementation. Currently supports:
@@ -63,6 +70,8 @@ n := deep.NewNeural(&deep.Config{
 	Weight: deep.NewNormal(1.0, 0.0),
 	/* Apply bias */
 	Bias: true,
+	/*to activativate the Bonds function when training the neural net, use a number other than 0*/
+	Bonds: 0.00001,
 })
 ```
 Train:
