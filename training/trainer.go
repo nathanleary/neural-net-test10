@@ -98,8 +98,14 @@ func (t *OnlineTrainer) calculateDeltas(n *deep.Neural, ideal []float32) {
 		for j, neuron := range n.Layers[i].Neurons {
 			var sum float32
 			for k, s := range neuron.Out {
-				sum += s.Weight * t.deltas[i+1][k]
+				b := float32(0.0)
+				for k >= len(s.Bond) {
+					s.Bond = append(s.Bond, 1.0)
+				}
+				b = s.Bond[k]
+				sum += s.Weight * t.deltas[i+1][k] * b
 			}
+
 			t.deltas[i][j] = neuron.DActivate(neuron.Value) * sum
 		}
 	}

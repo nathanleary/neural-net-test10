@@ -124,6 +124,7 @@ func (t *BatchTrainer) Train(n *deep.Neural, examples, validation model.Examples
 					for j, jPD := range iPD {
 						jAD := iAD[j]
 						for k, v := range jPD {
+
 							jAD[k] += v
 							jPD[k] = 0
 						}
@@ -157,14 +158,27 @@ func (t *BatchTrainer) calculateDeltas(n *deep.Neural, ideal []float32, wid int)
 
 	for i := len(n.Layers) - 2; i >= 0; i-- {
 		l := n.Layers[i]
+
 		iD := deltas[i]
+
 		nextD := deltas[i+1]
+
 		for j, n := range l.Neurons {
+
 			var sum float32
+
 			for k, s := range n.Out {
-				sum += s.Weight * nextD[k]
+				b := float32(0.0)
+				for k >= len(s.Bond) {
+					s.Bond = append(s.Bond, 1.0)
+				}
+				b = s.Bond[k]
+
+				sum += s.Weight * nextD[k] * b
 			}
+
 			iD[j] = n.DActivate(n.Value) * sum
+
 		}
 	}
 
@@ -174,8 +188,16 @@ func (t *BatchTrainer) calculateDeltas(n *deep.Neural, ideal []float32, wid int)
 		for j, n := range l.Neurons {
 			jD := iD[j]
 			jPD := iPD[j]
+
 			for k, s := range n.In {
-				jPD[k] += jD * s.In
+
+				b := float32(0.0)
+				for k >= len(s.Bond) {
+					s.Bond = append(s.Bond, 1.0)
+				}
+				b = s.Bond[k]
+
+				jPD[k] += jD * s.In * b
 			}
 		}
 	}
